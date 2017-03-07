@@ -1,6 +1,7 @@
 {% extends 'rango/base.html' %}
-
+{% load static %}
 {% block body_block %}
+<div class="hero-unit">
   <h1>Register with Rango</h1>
 
   {% if registered %}
@@ -24,5 +25,5 @@
     <input type="submit" name="submit" value="Register" />
   </form>
   {% endif %}
-
+</div>
 {% endblock %}

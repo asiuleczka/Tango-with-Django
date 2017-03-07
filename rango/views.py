@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from datetime import datetime
 
 
 def index(request):
@@ -30,8 +31,22 @@ def index(request):
     # This attribute stores an encoded URL (e.g. spaces replaced with underscores).
     for category in category_list:
         category.url = category.name.replace(' ', '_')
-
-    # Render the response and send it back!
+    #### NEW CODE ####
+    # Obtain our Response object early so we can add cookie information.
+    #### NEW CODE ####
+    if request.session.get('last_visit'):
+        # The session has a value for the last visit
+        last_visit_time = request.session.get('last_visit')
+        visits = request.session.get('visits', 0)
+        if (datetime.now() - datetime.strptime(last_visit_time[:-7], "%Y-%m-%d %H:%M:%S")).days > 0:
+            request.session['visits'] = visits + 1
+            request.session['last_visit'] = str(datetime.now())
+    else:
+        # The get returns None, and the session does not have a value for the last visit.
+        request.session['last_visit'] = str(datetime.now())
+        request.session['visits'] = 1
+    #### END NEW CODE ####
+    # Render and return the rendered response back to the user.
     return render_to_response('rango/index.html', context_dict, context)
 
 def decode_url(element):
@@ -42,8 +57,15 @@ def encode_url(element):
 
 def about(request):
     context = RequestContext(request)
-    context_dict = {'boldmessage': "This is another message"}
-    return render_to_response('rango/about.html', context_dict, context)
+    # If the visits session varible exists, take it and use it.
+    # If it doesn't, we haven't visited the site so set the count to zero.
+    if request.session.get('visits'):
+        count = request.session.get('visits')
+    else:
+        count = 0
+    # remember to include the visit data
+    return render_to_response('rango/about.html', {'visits': count}, context)
+
 
 def category(request, category_name_url):
     # Request our context from the request passed to us.

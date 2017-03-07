@@ -3,8 +3,11 @@
 {% load static %}
 
 {% block body_block %}
+<div class="hero-unit">
   <h1>Rango says...</h1>
   Here is the about page! <strong>{{ boldmessage }}</strong><br />
-  <img src="{% static "rango.jpg" %}" alt="Picture of Rango" /> <!-- New line -->
+  <img src="{% static "rango.jpg" %}" alt="Picture of Rango" /> <!-- New line --></br>
 
+  <h2> Number of visits to this page: {{ visits }}</h2>
+</div>
 {% endblock %}
